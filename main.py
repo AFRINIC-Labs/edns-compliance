@@ -66,7 +66,7 @@ if __name__ == '__main__':
     base_url = 'http://ftp.afrinic.net/pub/zones/'
     ext = '-AFRINIC'
     zone_files = get_files(base_url, ext)
-    print('Number of zones files to be donwnloaded: {}'.format(zone_files.__len__()))
+    print('Number of zones files to be downloaded: {}'.format(zone_files.__len__()))
     seg_list = process_zones(zone_files, outfile_suffix='zoneslists')
     seg_liststr = [i.name for i in seg_list]
     print("Below is the list of output files:\n{}".format('\n'.join(seg_liststr)))
