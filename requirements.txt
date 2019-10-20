@@ -1,0 +1,7 @@
+requests
+json
+dnspython
+psycopg2
+pandas
+pathlib
+beautifulsoup4

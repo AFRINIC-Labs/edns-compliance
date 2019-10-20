@@ -1,9 +1,4 @@
-create schema public;
-
-comment on schema public is 'standard public schema';
-
-alter schema public owner to postgres;
-
+-- Afrinic Tables
 create table edns_reverse
 (
 	id serial not null
@@ -25,26 +20,51 @@ create table ns_resolution
 	name_server varchar not null,
 	ns_ip varchar not null,
 	ns_ipv6 varchar
+	asn varchar
 );
 
 alter table ns_resolution owner to postgres;
 
 create table edns_tests
 (
-	ns_id integer,
-	dns_plain boolean,
-	edns_plain boolean,
-	edns_unknw boolean,
-	edns_unknwopt boolean,
-	edns_unknwflag boolean,
-	edns_dnssec boolean,
-	edns_trunc boolean,
-	edns_unknwveropt boolean,
-	final_result boolean
+	ns varchar,
+	dns_plain int,
+	edns_plain int,
+	edns_unknw int,
+	edns_unknwopt int,
+	edns_unknwflag int,
+	edns_dnssec int,
+	edns_trunc int,
+	edns_unknwveropt int
 );
 
 alter table edns_tests owner to postgres;
 
-create unique index edns_tests_id_uindex
-	on edns_tests (ns_id);
+
+-- ccTLD tables
+create table cctld_ns_resolution
+(
+	countrycode varchar not null,
+	name_server varchar not null,
+	ns_ip varchar not null,
+	ns_ipv6 varchar,
+	asn varchar
+);
+
+alter table cctld_ns_resolution owner to postgres;
+
+create table cctld_edns_tests
+(
+	ns varchar,
+	dns_plain int,
+	edns_plain int,
+	edns_unknw int,
+	edns_unknwopt int,
+	edns_unknwflag int,
+	edns_dnssec int,
+	edns_trunc int,
+	edns_unknwveropt int
+);
+
+alter table cctld_edns_tests owner to postgres;
 
