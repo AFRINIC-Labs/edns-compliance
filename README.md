@@ -1,9 +1,9 @@
-# Afrinic EDNS-Compliance Survey 
+# Survey of EDNS non-compliant domains from AFRINIC reverse DNS and secondary DNS zones 
 A survey of EDNS compliant DNS servers in Africa.
 
 ## Survey consits of two parts:
-- **AfriNIC registered Name Servers with their eDNS compliance status**
-- **ccTLD (Country Code Top Level Domain) Name Servers with their eDNS compliance status**
+- **EDNS compliancy for AFRINIC reverse DNS servers for prefixes delegated to members**
+- **EDNS compliancy for ccTLD (Country Code Top Level Domain) in Africa**
 
 ## Results expected:
 - AfriNIC:
