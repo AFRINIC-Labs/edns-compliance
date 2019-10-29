@@ -1,7 +1,5 @@
-requests
-json
-dnspython
-psycopg2
-pandas
-pathlib
-beautifulsoup4
+requests==2.22.0
+pandas==0.25.2
+psycopg2==2.8.3
+beautifulsoup4==4.8.1
+dnspython==1.16.0
