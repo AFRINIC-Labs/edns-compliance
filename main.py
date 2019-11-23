@@ -33,8 +33,6 @@ db_cursor = db_connection.cursor()
 # Define Todays Date:
 today_date = DT.datetime.today().strftime('%Y-%m-%d')
 
-
-
 # Define function to get the list of files to be download from AFRINIC FTP
 def get_files(url, ext='', params={}):
     response = requests.get(url, params=params)
@@ -177,7 +175,7 @@ def run_dig_cmd(cmd: list):
 
 # Define function to run tests on NS
 def run_ednsComp_test(ns: str, df, cc: bool = False):
-    if cc: 
+    if cc:
         zone = df[df[1].str.match(ns)].iloc[0][0]
     else: zone = df[df['NameServer'].str.match(ns)].iloc[0][0]
     # Reset results vars
@@ -258,7 +256,6 @@ if __name__ == '__main__':
     print("    ---------------------------- END:: Insert Reverse Zone lists into DB ----------------------------")
 
 
-
     ########################### Execution of EDNS Compliance test on the Lisf of Unique Nameservers identified ###########################
     print("    ---------------------------- START:: Execution of EDNS Compliance test on the Lisf of Unique Nameservers identified ----------------------------")
     # Execution of EDNS Compliance test on the Lisf of Unique Nameservers identified
@@ -276,30 +273,3 @@ if __name__ == '__main__':
                 columns=['exec_date', 'ns', 'dns_plain', 'edns_plain', 'edns_unknw', 'edns_unknwopt', 'edns_unknwflag', 'edns_dnssec', 'edns_trunc', 'edns_unknwveropt', 'edns_tcp', 'ip_type'] )
 
     print("    ---------------------------- END:: Execution of EDNS Compliance test on the Lisf of Unique Nameservers identified ----------------------------")
-
-    ########################### Retrieval country codes and their respective NS & insert in DB ###########################
-    print("    ---------------------------- START:: Retrieval country codes and their respective NS & insert in DB ----------------------------")
-    # Retrieval country codes and their respective NS & insert in DB
-    data_list = []
-    for cc in get_african_countries():
-        for ns in domain_ns_retrieval(cc):
-            ns_ip, ns_ipv6 = ns_resolver(ns), ns_resolverV6(ns)
-            asnv4, asnv6, ccv4, ccv6 = get_asn_ripe(ns_ip), get_asn_ripe(ns_ipv6), get_country_ripe(ns_ip), get_country_ripe(ns_ipv6)
-            db_insert_func(
-                data_list=[today_date, cc, ns, ns_ip, ns_ipv6, asnv4, asnv6, ccv4, ccv6],
-                tabname='cctld_ns_resolution',
-                columns=['exec_date', 'countrycode', 'name_server', 'ns_ip', 'ns_ipv6', 'asnv4', 'asnv6', 'ccv4', 'ccv6'])
-            data_list.append([cc, ns])
-
-    # Test EDNS Compliance for the ccTLD nameServer
-    cctld_df = pd.DataFrame.from_records(data_list)
-
-    for ns in cctld_df[1].unique():
-        db_insert_func(
-                data_list=[today_date] + run_ednsComp_test(ns, cctld_df, cc=True),
-                tabname='cctld_edns_tests',
-                columns=['exec_date', 'ns', 'dns_plain', 'edns_plain', 'edns_unknw', 'edns_unknwopt', 'edns_unknwflag', 'edns_dnssec', 'edns_trunc', 'edns_unknwveropt', 'edns_tcp'] )
-
-    print("    ---------------------------- END:: Retrieval country codes and their respective NS & insert in DB ----------------------------")
-
-    print("    ---------------------------- END EXECUTION ----------------------------")
