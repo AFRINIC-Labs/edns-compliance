@@ -112,7 +112,7 @@ def get_african_countries():
     url = 'http://country.io/continent.json'
     open('data/country.json', 'w').write(requests.get(url,
                                                       allow_redirects=True).content.decode("utf-8"))
-    all_countries = json.load(open('country.json', 'r'))
+    all_countries = json.load(open('data/country.json', 'r'))
     af_cc = list()
     for k, v in all_countries.items():
         if v == "AF":
