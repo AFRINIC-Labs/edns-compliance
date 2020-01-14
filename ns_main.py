@@ -309,7 +309,7 @@ if __name__ == "__main__":
             tabname='cctld_edns_tests',
             columns=['exec_date', 'ns', 'dns_plain', 'edns_plain', 'edns_unknw', 'edns_unknwopt',
                      'edns_unknwflag', 'edns_dnssec', 'edns_trunc', 'edns_unknwveropt', 'edns_tcp',
-                     'packet_size', 'zone', 'f_edns_no_tcp', 'f_edns_tcp', 'f_packet_size', 'absolute_compliant', 'ip_type'])
+                     'packet_size', 'zone', 'f_edns_no_tcp', 'f_edns_tcp', 'f_packet_size', 'absolute_compliant'])
 
     print("    ---------------------------- END:: Retrieval country codes and their respective NS & insert in DB ----------------------------")
 
