@@ -33,6 +33,17 @@ db_cursor = db_connection.cursor()
 # Define Todays Date:
 today_date = DT.datetime.today().strftime('%Y-%m-%d')
 
+
+# Define function to send requests to Healthchecks.io for process tracking
+def healthchecks(url, param):
+    try:
+        requests.get(url + "/start", timeout=5)
+    except requests.exceptions.RequestException:
+        # If the network request fails for any reason, we don't want
+        # it to prevent the main job from running
+        pass
+
+
 # Define function to get the list of files to be download from AFRINIC FTP
 def get_files(url, ext='', params={}):
     response = requests.get(url, params=params)
@@ -149,51 +160,99 @@ def get_country_ripe(ip_addr: str):
     return result
 
 
-
 # Define EDNS Tests list
 edns_test_dict = {'dns_plain': ['dig', '+norec', '+noedns', 'soa'],
-    'edns_plain': ['dig', '+norec', '+edns=0', 'soa'],
-    'edns_unknw': ['dig', '+norec', '+edns=100', '+noednsneg', 'soa'],
-    'edns_unknwopt': ['dig', '+norec', '+ednsopt=100', 'soa'],
-    'edns_unknwflag': ['dig', '+norec', '+ednsflags=0x80', 'soa'],
-    'edns_dnssec': ['dig', '+norec', '+dnssec', 'soa'],
-    'edns_trunc': ['dig', '+norec', '+dnssec', '+bufsize=512', '+ignore', 'dnskey'],
-    'edns_unknwveropt': ['dig', '+norec', '+edns=100', '+noednsneg', '+ednsopt=100', 'soa'],
-    'edns_tcp': ['dig', '+norec', '+tcp', 'soa']}
+                  'edns_plain': ['dig', '+norec', '+edns=0', 'soa'],
+                  'edns_unknw': ['dig', '+norec', '+edns=100', '+noednsneg', 'soa'],
+                  'edns_unknwopt': ['dig', '+norec', '+ednsopt=100', 'soa'],
+                  'edns_unknwflag': ['dig', '+norec', '+ednsflags=0x80', 'soa'],
+                  'edns_dnssec': ['dig', '+norec', '+dnssec', 'soa'],
+                  'edns_trunc': ['dig', '+norec', '+dnssec', '+bufsize=512', '+ignore', 'dnskey'],
+                  'edns_unknwveropt': ['dig', '+norec', '+edns=100', '+noednsneg', '+ednsopt=100', 'soa'],
+                  'edns_tcp': ['dig', '+norec', '+tcp', 'soa']}
+
 
 # Define function to execute dig command
-def run_dig_cmd(cmd: list):
+def run_dig_cmd(cmd: list, pkt_size=False, flag=False, aa_zone=None):
     status = None
     edns_version = None
-    result = subprocess.run(cmd, stdout=subprocess.PIPE).stdout.decode('utf-8').split(';;')
+    pckt_size, flags, answer_section = None, None, None
+    result = subprocess.run(
+        cmd, stdout=subprocess.PIPE).stdout.decode('utf-8').split(';;')
     for line in result:
         if re.search('status:', line):
             status = line.split(',')[1].split(':')[1].strip()
         elif re.search('EDNS: version: 0', line):
             edns_version = 0
-    return status, edns_version, result
+            if pkt_size:
+                pckt_size = line.split('; ')[2].split(':')[1].replace(
+                    ' ', '').replace('\n', '')  # Get the Maximum UDP packet size
+            if flag:
+                flags = line.split(';')[1].split(':')[3].replace(
+                    '\n', '').split(' ')  # Get the flags
+        elif aa_zone is not None and re.search('ANSWER SECTION', line):
+            answer_section = True if re.search(aa_zone, line) else None  # Get the flags
+    return status, edns_version, pckt_size, flags, answer_section, result
+
 
 # Define function to run tests on NS
-def run_ednsComp_test(ns: str, df, cc: bool = False):
-    if cc:
-        zone = df[df[1].str.match(ns)].iloc[0][0]
-    else: zone = df[df['NameServer'].str.match(ns)].iloc[0][0]
+def run_ednsComp_test(ns: str, df):
+    zone = df[df['NameServer'].str.match(ns)].iloc[0][0]
     # Reset results vars
-    dns_plain, edns_plain, edns_unknw, edns_unknwopt, edns_unknwflag, edns_dnssec, edns_trunc, edns_unknwveropt, edns_tcp = 0, 0, 0, 0, 0, 0, 0, 0, 0
+    dns_plain, edns_plain, edns_unknw, edns_unknwopt, edns_unknwflag, edns_dnssec, edns_trunc, edns_unknwveropt, edns_tcp = False, False, False, False, False, False, False, False, False
+    packet_size = 0
+    absolute_compliant = False
     # Test DNS plain resolution first
-    dns_plain = 1 if run_dig_cmd(edns_test_dict['dns_plain'] + [zone, '@' + ns])[0] == 'NOERROR' else 0
+    dns_plain = True if run_dig_cmd(
+        edns_test_dict['dns_plain'] + [zone, '@' + ns], aa_zone=zone)[:-1] == ('NOERROR', None, None, None, True) else False
     if dns_plain:
         # Test EDNS plain resolution first
-        edns_plain = 1 if run_dig_cmd(edns_test_dict['edns_plain'] + [zone, '@' + ns])[0:2] == ('NOERROR', 0) else 0
+        edns_plain_test = run_dig_cmd(
+            edns_test_dict['edns_plain'] + [zone, '@' + ns], pkt_size=True)[:-1]
+        packet_size = edns_plain_test[2]
+        edns_plain = True if edns_plain_test == (
+            'NOERROR', 0, packet_size, None, None) else False
         if edns_plain:
-            edns_unknw = 1 if run_dig_cmd(edns_test_dict['edns_unknw'] + [zone, '@' + ns])[0:2] == ('BADVERS', 0) else 0
-            edns_unknwopt = 1 if run_dig_cmd(edns_test_dict['edns_unknwopt'] + [zone, '@' + ns])[0:2] == ('NOERROR', 0) else 0
-            edns_unknwflag = 1 if run_dig_cmd(edns_test_dict['edns_unknwflag'] + [zone, '@' + ns])[0:2] == ('NOERROR', 0) else 0
-            edns_dnssec = 1 if run_dig_cmd(edns_test_dict['edns_dnssec'] + [zone, '@' + ns])[0:2] == ('NOERROR', 0) else 0
-            edns_trunc = 1 if run_dig_cmd(edns_test_dict['edns_trunc'] + [zone, '@' + ns])[0:2] == ('NOERROR', 0) else 0
-            edns_unknwveropt = 1 if run_dig_cmd(edns_test_dict['edns_unknwveropt'] + [zone, '@' + ns])[0:2] == ('BADVERS', 0) else 0
-            edns_tcp = 1 if run_dig_cmd(edns_test_dict['edns_tcp'] + [zone, '@' + ns])[0:2] == ('NOERROR', 0) else 0
-    return [ns, dns_plain, edns_plain, edns_unknw, edns_unknwopt, edns_unknwflag, edns_dnssec, edns_trunc, edns_unknwveropt, edns_tcp]
+            edns_unknw = True if run_dig_cmd(
+                edns_test_dict['edns_unknw'] + [zone, '@' + ns], aa_zone=zone)[:-1] == ('BADVERS', 0, None, None, None) else False
+
+            edns_unknwopt = True if run_dig_cmd(
+                edns_test_dict['edns_unknwopt'] + [zone, '@' + ns], aa_zone=zone)[:-1] == ('NOERROR', 0, None, None, True) else False
+
+            edns_unknwflag = True if run_dig_cmd(
+                edns_test_dict['edns_unknwflag'] + [zone, '@' + ns], aa_zone=zone)[:-1] == ('NOERROR', 0, None, None, True) else False
+
+            edns_dnssec_test = run_dig_cmd(
+                edns_test_dict['edns_dnssec'] + [zone, '@' + ns], aa_zone=zone, flag=True)[:-1]
+            if 'do' in edns_dnssec_test[3] and edns_dnssec_test[4] is True and edns_dnssec_test[0:2] == ('NOERROR', 0):
+                edns_dnssec = True
+            else:
+                edns_dnssec = False
+
+            edns_trunc = True if run_dig_cmd(
+                edns_test_dict['edns_trunc'] + [zone, '@' + ns])[0:2] == ('NOERROR', 0) else False
+
+            edns_unknwveropt = True if run_dig_cmd(
+                edns_test_dict['edns_unknwveropt'] + [zone, '@' + ns], aa_zone=zone)[0:2] == ('BADVERS', 0) else False
+
+            edns_tcp = True if run_dig_cmd(
+                edns_test_dict['edns_tcp'] + [zone, '@' + ns])[0:2] == ('NOERROR', 0) else False
+
+    t_results = [ns, dns_plain, edns_plain, edns_unknw, edns_unknwopt, edns_unknwflag,
+                 edns_dnssec, edns_trunc, edns_unknwveropt, edns_tcp, packet_size, zone]
+
+    # Process EDNS test results for appropriate results in DB
+    f_edns_no_tcp, f_edns_tcp, f_packet_size = False, False, False
+    if t_results[1:10] == [True, True, True, True, True, True, True, True, False]:
+        f_edns_no_tcp = True
+    if t_results[1:10] == [True, True, True, True, True, True, True, True, True]:
+        f_edns_tcp = True
+    if t_results[10] in range(512, 1233):
+        f_packet_size = True
+    if f_edns_tcp and f_packet_size:
+        absolute_compliant = True
+    return t_results + [f_edns_no_tcp, f_edns_tcp, f_packet_size, absolute_compliant]
+
 
 
 
@@ -255,21 +314,24 @@ if __name__ == '__main__':
 
     print("    ---------------------------- END:: Insert Reverse Zone lists into DB ----------------------------")
 
-
     ########################### Execution of EDNS Compliance test on the Lisf of Unique Nameservers identified ###########################
     print("    ---------------------------- START:: Execution of EDNS Compliance test on the Lisf of Unique Nameservers identified ----------------------------")
     # Execution of EDNS Compliance test on the Lisf of Unique Nameservers identified
     # Ipv4
     for ns in ns_unique:
         db_insert_func(
-                data_list=[today_date] + run_ednsComp_test(ns, pdata) + ['v4'],
-                tabname='edns_tests',
-                columns=['exec_date', 'ns', 'dns_plain', 'edns_plain', 'edns_unknw', 'edns_unknwopt', 'edns_unknwflag', 'edns_dnssec', 'edns_trunc', 'edns_unknwveropt', 'edns_tcp', 'ip_type'] )
+            data_list=[today_date] + run_ednsComp_test(ns, pdata) + ['v4'],
+            tabname='edns_tests',
+            columns=['exec_date', 'ns', 'dns_plain', 'edns_plain', 'edns_unknw', 'edns_unknwopt',
+                     'edns_unknwflag', 'edns_dnssec', 'edns_trunc', 'edns_unknwveropt', 'edns_tcp',
+                     'packet_size', 'zone', 'f_edns_no_tcp', 'f_edns_tcp', 'f_packet_size', 'absolute_compliant', 'ip_type'])
     # Ipv6
     for ns in ns_unique6:
         db_insert_func(
-                data_list=[today_date] + run_ednsComp_test(ns, pdata6) + ['v6'],
-                tabname='edns_tests',
-                columns=['exec_date', 'ns', 'dns_plain', 'edns_plain', 'edns_unknw', 'edns_unknwopt', 'edns_unknwflag', 'edns_dnssec', 'edns_trunc', 'edns_unknwveropt', 'edns_tcp', 'ip_type'] )
+            data_list=[today_date] + run_ednsComp_test(ns, pdata6) + ['v6'],
+            tabname='edns_tests',
+            columns=['exec_date', 'ns', 'dns_plain', 'edns_plain', 'edns_unknw', 'edns_unknwopt',
+                     'edns_unknwflag', 'edns_dnssec', 'edns_trunc', 'edns_unknwveropt', 'edns_tcp',
+                     'packet_size', 'zone', 'f_edns_no_tcp', 'f_edns_tcp', 'f_packet_size', 'absolute_compliant', 'ip_type'])
 
     print("    ---------------------------- END:: Execution of EDNS Compliance test on the Lisf of Unique Nameservers identified ----------------------------")

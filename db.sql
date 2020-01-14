@@ -33,24 +33,29 @@ create table ns_resolution
 
 alter table ns_resolution owner to ymk;
 
-create table edns_tests
-(	
-	id serial not null
-		constraint edns_tests_pk
-			primary key,
-	exec_date date,
-	ns varchar,
-	dns_plain int,
-	edns_plain int,
-	edns_unknw int,
-	edns_unknwopt int,
-	edns_unknwflag int,
-	edns_dnssec int,
-	edns_trunc int,
-	edns_unknwveropt int,
-	edns_tcp int,
-	ip_type varchar,
+CREATE TABLE edns_tests
+(
+	id serial NOT NULL,
+	exec_date date NULL,
+	ns varchar NULL,
+	"zone" varchar NULL,
+	dns_plain varchar NULL,
+	edns_plain varchar NULL,
+	edns_unknw varchar NULL,
+	edns_unknwopt varchar NULL,
+	edns_unknwflag varchar NULL,
+	edns_dnssec varchar NULL,
+	edns_trunc varchar NULL,
+	edns_unknwveropt varchar NULL,
+	edns_tcp varchar NULL,
+	packet_size numeric NULL,
+	f_edns_no_tcp varchar NULL,
+	f_edns_tcp varchar NULL,
+	f_packet_size varchar NULL,
+	ip_type varchar NULL,
 	insert_date timestamp default CURRENT_TIMESTAMP not null
+	absolute_compliant varchar NULL,
+	CONSTRAINT edns_tests_pk PRIMARY KEY (id)
 );
 
 alter table edns_tests owner to ymk;
@@ -58,7 +63,7 @@ alter table edns_tests owner to ymk;
 
 -- ccTLD tables
 create table cctld_ns_resolution
-(	
+(
 	id serial not null
 		constraint cctld_ns_resolution_pk
 			primary key,
@@ -77,22 +82,28 @@ create table cctld_ns_resolution
 alter table cctld_ns_resolution owner to ymk;
 
 create table cctld_edns_tests
-(	
-	id serial not null
-		constraint cctld_edns_tests_pk
-			primary key,
-	exec_date date,
-	ns varchar,
-	dns_plain int,
-	edns_plain int,
-	edns_unknw int,
-	edns_unknwopt int,
-	edns_unknwflag int,
-	edns_dnssec int,
-	edns_trunc int,
-	edns_unknwveropt int,
-	edns_tcp int,
+(
+	id serial NOT NULL,
+	exec_date date NULL,
+	ns varchar NULL,
+	"zone" varchar NULL,
+	dns_plain varchar NULL,
+	edns_plain varchar NULL,
+	edns_unknw varchar NULL,
+	edns_unknwopt varchar NULL,
+	edns_unknwflag varchar NULL,
+	edns_dnssec varchar NULL,
+	edns_trunc varchar NULL,
+	edns_unknwveropt varchar NULL,
+	edns_tcp varchar NULL,
+	packet_size numeric NULL,
+	f_edns_no_tcp varchar NULL,
+	f_edns_tcp varchar NULL,
+	f_packet_size varchar NULL,
+	ip_type varchar NULL,
 	insert_date timestamp default CURRENT_TIMESTAMP not null
+	absolute_compliant varchar NULL,
+	CONSTRAINT edns_tests_pk PRIMARY KEY (id)
 );
 
 alter table cctld_edns_tests owner to ymk;
