@@ -53,7 +53,7 @@ CREATE TABLE edns_tests
 	f_edns_tcp varchar NULL,
 	f_packet_size varchar NULL,
 	ip_type varchar NULL,
-	insert_date timestamp default CURRENT_TIMESTAMP not null
+	insert_date timestamp default CURRENT_TIMESTAMP not null,
 	absolute_compliant varchar NULL,
 	CONSTRAINT edns_tests_pk PRIMARY KEY (id)
 );
@@ -101,7 +101,7 @@ create table cctld_edns_tests
 	f_edns_tcp varchar NULL,
 	f_packet_size varchar NULL,
 	ip_type varchar NULL,
-	insert_date timestamp default CURRENT_TIMESTAMP not null
+	insert_date timestamp default CURRENT_TIMESTAMP not null,
 	absolute_compliant varchar NULL,
 	CONSTRAINT edns_tests_pk PRIMARY KEY (id)
 );

@@ -224,9 +224,10 @@ def run_ednsComp_test(ns: str, df):
 
             edns_dnssec_test = run_dig_cmd(
                 edns_test_dict['edns_dnssec'] + [zone, '@' + ns], aa_zone=zone, flag=True)[:-1]
-            if 'do' in edns_dnssec_test[3] and edns_dnssec_test[4] is True and edns_dnssec_test[0:2] == ('NOERROR', 0):
-                edns_dnssec = True
-            else:
+            try:
+                if 'do' in edns_dnssec_test[3] and edns_dnssec_test[4] is True and edns_dnssec_test[0:2] == ('NOERROR', 0):
+                    edns_dnssec = True
+            except Exception:
                 edns_dnssec = False
 
             edns_trunc = True if run_dig_cmd(
