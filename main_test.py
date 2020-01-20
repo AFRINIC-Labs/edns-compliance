@@ -212,32 +212,32 @@ def run_ednsComp_test(ns: str, df):
         packet_size = edns_plain_test[2]
         edns_plain = True if edns_plain_test == (
             'NOERROR', 0, packet_size, None, None) else False
-        if edns_plain:
-            edns_unknw = True if run_dig_cmd(
-                edns_test_dict['edns_unknw'] + [zone, '@' + ns], aa_zone=zone)[:-1] == ('BADVERS', 0, None, None, None) else False
 
-            edns_unknwopt = True if run_dig_cmd(
-                edns_test_dict['edns_unknwopt'] + [zone, '@' + ns], aa_zone=zone)[:-1] == ('NOERROR', 0, None, None, True) else False
+        edns_unknw = True if run_dig_cmd(
+            edns_test_dict['edns_unknw'] + [zone, '@' + ns], aa_zone=zone)[:-1] == ('BADVERS', 0, None, None, None) else False
 
-            edns_unknwflag = True if run_dig_cmd(
-                edns_test_dict['edns_unknwflag'] + [zone, '@' + ns], aa_zone=zone)[:-1] == ('NOERROR', 0, None, None, True) else False
+        edns_unknwopt = True if run_dig_cmd(
+            edns_test_dict['edns_unknwopt'] + [zone, '@' + ns], aa_zone=zone)[:-1] == ('NOERROR', 0, None, None, True) else False
 
-            edns_dnssec_test = run_dig_cmd(
-                edns_test_dict['edns_dnssec'] + [zone, '@' + ns], aa_zone=zone, flag=True)[:-1]
-            try:
-                if 'do' in edns_dnssec_test[3] and edns_dnssec_test[4] is True and edns_dnssec_test[0:2] == ('NOERROR', 0):
-                    edns_dnssec = True
-            except Exception:
-                edns_dnssec = False
+        edns_unknwflag = True if run_dig_cmd(
+            edns_test_dict['edns_unknwflag'] + [zone, '@' + ns], aa_zone=zone)[:-1] == ('NOERROR', 0, None, None, True) else False
 
-            edns_trunc = True if run_dig_cmd(
-                edns_test_dict['edns_trunc'] + [zone, '@' + ns])[0:2] == ('NOERROR', 0) else False
+        edns_dnssec_test = run_dig_cmd(
+            edns_test_dict['edns_dnssec'] + [zone, '@' + ns], aa_zone=zone, flag=True)[:-1]
+        try:
+            if 'do' in edns_dnssec_test[3] and edns_dnssec_test[4] is True and edns_dnssec_test[0:2] == ('NOERROR', 0):
+                edns_dnssec = True
+        except Exception:
+            edns_dnssec = False
 
-            edns_unknwveropt = True if run_dig_cmd(
-                edns_test_dict['edns_unknwveropt'] + [zone, '@' + ns], aa_zone=zone)[0:2] == ('BADVERS', 0) else False
+        edns_trunc = True if run_dig_cmd(
+            edns_test_dict['edns_trunc'] + [zone, '@' + ns])[0:2] == ('NOERROR', 0) else False
 
-            edns_tcp = True if run_dig_cmd(
-                edns_test_dict['edns_tcp'] + [zone, '@' + ns])[0:2] == ('NOERROR', 0) else False
+        edns_unknwveropt = True if run_dig_cmd(
+            edns_test_dict['edns_unknwveropt'] + [zone, '@' + ns], aa_zone=zone)[0:2] == ('BADVERS', 0) else False
+
+        edns_tcp = True if run_dig_cmd(
+            edns_test_dict['edns_tcp'] + [zone, '@' + ns])[0:2] == ('NOERROR', 0) else False
 
     t_results = [ns, dns_plain, edns_plain, edns_unknw, edns_unknwopt, edns_unknwflag,
                  edns_dnssec, edns_trunc, edns_unknwveropt, edns_tcp, packet_size, zone]

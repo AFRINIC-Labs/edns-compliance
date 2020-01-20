@@ -1,40 +1,37 @@
 -- Afrinic Tables
-create table edns_reverse
-(
-	id serial not null
-		constraint edns_reverse_pk
-			primary key,
-	exec_date date,
-	reverse_ns varchar not null,
-	ns_type varchar not null,
-	nameserver varchar not null,
-	ip_type varchar,
-	insert_date timestamp default CURRENT_TIMESTAMP not null
+CREATE TABLE public.edns_reverse (
+	id serial NOT NULL,
+	exec_date date NULL,
+	reverse_ns varchar NOT NULL,
+	ns_type varchar NOT NULL,
+	nameserver varchar NOT NULL,
+	ip_type varchar NULL,
+	insert_date timestamp NOT NULL DEFAULT now(),
+	CONSTRAINT edns_reverse_pk PRIMARY KEY (id)
 );
 
 alter table edns_reverse owner to ymk;
 
-create table ns_resolution
-(
-	id serial not null
-		constraint ns_resolution_pk
-			primary key,
-	exec_date date,
-	name_server varchar not null,
-	ns_ip varchar not null,
-	ns_ipv6 varchar,
-	asnv4 varchar,
-	asnv6 varchar,
-	ccv4 varchar,
-	ccv6 varchar,
-	ip_type varchar,
-	insert_date timestamp default CURRENT_TIMESTAMP not null
+
+CREATE TABLE public.ns_resolution (
+	id serial NOT NULL,
+	exec_date date NULL,
+	name_server varchar NOT NULL,
+	ns_ip varchar NOT NULL,
+	ns_ipv6 varchar NULL,
+	asnv4 varchar NULL,
+	asnv6 varchar NULL,
+	ccv4 varchar NULL,
+	ccv6 varchar NULL,
+	ip_type varchar NULL,
+	insert_date timestamp NOT NULL DEFAULT now(),
+	CONSTRAINT ns_resolution_pk PRIMARY KEY (id)
 );
 
 alter table ns_resolution owner to ymk;
 
-CREATE TABLE edns_tests
-(
+
+CREATE TABLE public.edns_tests (
 	id serial NOT NULL,
 	exec_date date NULL,
 	ns varchar NULL,
@@ -53,7 +50,7 @@ CREATE TABLE edns_tests
 	f_edns_tcp varchar NULL,
 	f_packet_size varchar NULL,
 	ip_type varchar NULL,
-	insert_date timestamp default CURRENT_TIMESTAMP not null,
+	insert_date timestamp NOT NULL DEFAULT now(),
 	absolute_compliant varchar NULL,
 	CONSTRAINT edns_tests_pk PRIMARY KEY (id)
 );
@@ -62,27 +59,25 @@ alter table edns_tests owner to ymk;
 
 
 -- ccTLD tables
-create table cctld_ns_resolution
-(
-	id serial not null
-		constraint cctld_ns_resolution_pk
-			primary key,
-	exec_date date,
-	countrycode varchar not null,
-	name_server varchar not null,
-	ns_ip varchar not null,
-	ns_ipv6 varchar,
-	asnv4 varchar,
-	asnv6 varchar,
-	ccv4 varchar,
-	ccv6 varchar,
-	insert_date timestamp default CURRENT_TIMESTAMP not null
+CREATE TABLE public.cctld_ns_resolution (
+	id serial NOT NULL,
+	exec_date date NULL,
+	countrycode varchar NOT NULL,
+	name_server varchar NOT NULL,
+	ns_ip varchar NOT NULL,
+	ns_ipv6 varchar NULL,
+	asnv4 varchar NULL,
+	asnv6 varchar NULL,
+	ccv4 varchar NULL,
+	ccv6 varchar NULL,
+	insert_date timestamp NOT NULL DEFAULT now(),
+	CONSTRAINT cctld_ns_resolution_pk PRIMARY KEY (id)
 );
 
 alter table cctld_ns_resolution owner to ymk;
 
-create table cctld_edns_tests
-(
+
+CREATE TABLE public.cctld_edns_tests (
 	id serial NOT NULL,
 	exec_date date NULL,
 	ns varchar NULL,
@@ -101,9 +96,9 @@ create table cctld_edns_tests
 	f_edns_tcp varchar NULL,
 	f_packet_size varchar NULL,
 	ip_type varchar NULL,
-	insert_date timestamp default CURRENT_TIMESTAMP not null,
+	insert_date timestamp NOT NULL DEFAULT now(),
 	absolute_compliant varchar NULL,
-	CONSTRAINT edns_tests_pk PRIMARY KEY (id)
+	CONSTRAINT cctld_edns_tests_pk PRIMARY KEY (id)
 );
 
 alter table cctld_edns_tests owner to ymk;

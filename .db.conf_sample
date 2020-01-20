@@ -1,0 +1,10 @@
+{ 
+	"afrinic_db_remote":{ 
+		"HOST": "localhost", 
+		"USER": "****", 
+		"PASSWD": "****", 
+		"DB": "***",
+		"PORT" : ****
+	}
+}
+
