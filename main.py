@@ -248,7 +248,7 @@ def run_ednsComp_test(ns: str, df):
         f_edns_no_tcp = True
     if t_results[1:10] == [True, True, True, True, True, True, True, True, True]:
         f_edns_tcp = True
-    if t_results[10] in range(512, 1233):
+    if t_results[10] is not None and t_results[10] != '' and int(t_results[10]) in range(512, 1233):
         f_packet_size = True
     if f_edns_tcp and f_packet_size:
         absolute_compliant = True
