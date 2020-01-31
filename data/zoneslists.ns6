@@ -294,7 +294,7 @@ b.8.b.7.f.f.0.c.2.ip6.arpa.,NS,ns2.cvtel.co.za.
 c.8.b.7.f.f.0.c.2.ip6.arpa.,NS,ns1.cvtel.co.za.
 c.8.b.7.f.f.0.c.2.ip6.arpa.,NS,ns2.cvtel.co.za.
 d.8.b.7.f.f.0.c.2.ip6.arpa.,NS,ns1.cvtel.co.za.
-d.8.b.7.f.f.0.c.2.ip6.arpa.,NS,ns1.cvtel.co.za.
+d.8.b.7.f.f.0.c.2.ip6.arpa.,NS,ns2.cvtel.co.za.
 e.8.b.7.f.f.0.c.2.ip6.arpa.,NS,ns1.cvtel.co.za.
 e.8.b.7.f.f.0.c.2.ip6.arpa.,NS,ns2.cvtel.co.za.
 f.8.b.7.f.f.0.c.2.ip6.arpa.,NS,ns1.cvtel.co.za.
@@ -691,6 +691,8 @@ f.5.f.f.f.0.c.2.ip6.arpa.,NS,ns2.mweb.co.za.
 4.0.0.0.8.f.3.4.1.0.0.2.ip6.arpa.,NS,dns1.simbanet.net.
 4.0.0.0.8.f.3.4.1.0.0.2.ip6.arpa.,NS,ns1.simbanet.co.tz.
 4.0.0.0.8.f.3.4.1.0.0.2.ip6.arpa.,NS,ns1.simbanetwork.com.
+0.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.0.8.f.3.4.1.0.0.2.ip6.arpa.,NS,ole.kenic.or.ke.
+0.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.0.8.f.3.4.1.0.0.2.ip6.arpa.,NS,dms.kenic.or.ke.
 0.3.0.0.8.f.3.4.1.0.0.2.ip6.arpa.,NS,ns.coza.net.za.
 0.3.0.0.8.f.3.4.1.0.0.2.ip6.arpa.,NS,ns2.dns.business.
 0.7.0.0.8.f.3.4.1.0.0.2.ip6.arpa.,NS,ucthpx.uct.ac.za.
